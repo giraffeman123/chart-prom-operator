@@ -17,7 +17,7 @@ spec:
     protocol: TCP
     port: {{ .Values.deployment.monitorApp.service.port }}
     {{- if or (eq "NodePort" .Values.deployment.monitorApp.service.type) (eq "ClusterIP" .Values.deployment.monitorApp.service.type) }}      
-    targetPort: 80
+    targetPort: 8080
     {{- else }}
       {{- fail "Invalid service type. Service type must be NodePort or ClusterIP" }}
     {{- end }}
