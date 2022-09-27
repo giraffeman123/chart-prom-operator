@@ -10,7 +10,7 @@ spec:
   jobLabel: {{ .Values.prometheus.serviceMonitor.jobName }}
   selector:
     matchLabels:
-      app: {{ .Values.deployment.monitorApp.imageName }}
+      monitor-{{ .Values.deployment.monitorApp.imageName }}: true
   namespaceSelector:
     matchNames:
     - {{ .Values.namespace }}      

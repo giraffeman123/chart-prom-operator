@@ -6,6 +6,9 @@ metadata:
   namespace: {{ .Values.namespace }}
   labels:
     app: {{ .Values.deployment.monitorApp.imageName }}
+    {{- if .Values.prometheus.enabled }}
+    monitor-{{ .Values.deployment.monitorApp.imageName }}: true
+    {{- end }}
 spec:
   replicas: {{ .Values.deployment.monitorApp.replicaCount }}
   selector:
@@ -15,6 +18,9 @@ spec:
     metadata:
       labels:
         app: {{ .Values.deployment.monitorApp.imageName }}
+        {{- if .Values.prometheus.enabled }}
+        monitor-{{ .Values.deployment.monitorApp.imageName }}: true
+        {{- end }}
     spec:
       containers:
         - name: {{ .Values.deployment.monitorApp.imageName }}-container

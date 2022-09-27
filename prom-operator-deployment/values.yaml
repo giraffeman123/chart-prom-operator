@@ -45,7 +45,7 @@ prometheus:
     port: 9090   
 
 deployment:        
-  monitorApp:  
+  monitorApp:   
     imagePullSecrets: []    
     imageName: monitor-app 
     imageTag: latest
