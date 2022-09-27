@@ -1,0 +1,16 @@
+{{- if .Values.prometheus.enabled }}
+apiVersion: monitoring.coreos.com/v1
+kind: Prometheus
+metadata:
+  name: {{ .Values.prometheus.name }} 
+  namespace: {{ .Values.namespace }}
+spec:
+  serviceAccountName: {{ .Values.prometheus.serviceAccount.name }}
+  serviceMonitorSelector:
+    matchLabels:
+      monitoring: ns-{{ .Values.namespace }}
+  resources:
+    requests:
+      memory: 400Mi
+  enableAdminAPI: false
+{{- end }}    

@@ -1,0 +1,48 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Values.deployment.monitorApp.imageName }}
+  namespace: {{ .Values.namespace }}
+  labels:
+    app: {{ .Values.deployment.monitorApp.imageName }}
+spec:
+  replicas: {{ .Values.deployment.monitorApp.replicaCount }}
+  selector:
+    matchLabels:
+      app: {{ .Values.deployment.monitorApp.imageName }}
+  template:
+    metadata:
+      labels:
+        app: {{ .Values.deployment.monitorApp.imageName }}
+    spec:
+      containers:
+        - name: {{ .Values.deployment.monitorApp.imageName }}-container
+          image: {{ .Values.deployment.monitorApp.imageName }}:{{ .Values.deployment.monitorApp.imageTag | default .Chart.AppVersion }}
+          imagePullPolicy: {{ .Values.deployment.monitorApp.imagePullPolicy }}
+          ports:          
+            - name: web
+              containerPort: 8080
+          readinessProbe:
+            tcpSocket:
+              port: 8080
+            initialDelaySeconds: 5
+            periodSeconds: 10                           
+          livenessProbe:
+            httpGet:
+              path: {{ .Values.deployment.monitorApp.ingressPath }}/home
+              port: 8080
+            initialDelaySeconds: 5
+            periodSeconds: 5      
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}      
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}                       

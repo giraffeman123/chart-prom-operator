@@ -1,0 +1,15 @@
+{{- if .Values.prometheus.enabled }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Values.prometheus.service.name }}
+  namespace: {{ .Values.namespace }}
+spec:
+  type: {{ .Values.prometheus.service.type }}
+  ports:
+  - protocol: TCP
+    port: {{ .Values.prometheus.service.port }}
+    targetPort: 9090
+  selector:
+    prometheus: {{ .Values.prometheus.name }} 
+{{- end }}      

@@ -1,0 +1,23 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Values.deployment.monitorApp.service.name }}
+  namespace: {{ .Values.namespace }}
+  {{- if .Values.prometheus.enabled }}
+  annotations:
+    alpha.monitoring.coreos.com/non-namespaced: "true" 
+  {{- end }} 
+  labels:
+    app: {{ .Values.deployment.monitorApp.imageName }}
+spec:
+  selector:
+    app: {{ .Values.deployment.monitorApp.imageName }}
+  ports:
+  - name: web
+    protocol: TCP
+    port: {{ .Values.deployment.monitorApp.service.port }}
+    {{- if or (eq "NodePort" .Values.deployment.monitorApp.service.type) (eq "ClusterIP" .Values.deployment.monitorApp.service.type) }}      
+    targetPort: 80
+    {{- else }}
+      {{- fail "Invalid service type. Service type must be NodePort or ClusterIP" }}
+    {{- end }}

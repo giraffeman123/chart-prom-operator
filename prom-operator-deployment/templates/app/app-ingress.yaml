@@ -1,0 +1,23 @@
+{{- if .Values.ingress.enabled }}
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: {{ .Values.deployment.monitorApp.imageName }}
+  namespace: {{ .Values.namespace }}
+spec:
+  ingressClassName: {{ .Values.ingress.class }}
+  tls:
+    - hosts:
+        - {{ .Values.ingress.host }}
+  rules:
+  - host: {{ .Values.ingress.host }}
+    http:
+      paths:
+      - backend:
+          service:
+            name: {{ .Values.deployment.monitorApp.service.name }}
+            port:
+              number: {{ .Values.deployment.monitorApp.service.port }}
+        path: {{ .Values.deployment.monitorApp.ingressPath }}
+        pathType: Prefix
+{{- end }}
