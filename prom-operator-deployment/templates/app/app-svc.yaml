@@ -10,7 +10,7 @@ metadata:
   labels:
     app: {{ .Values.deployment.monitorApp.imageName }}
     {{- if .Values.prometheus.enabled }}
-    monitor-{{ .Values.deployment.monitorApp.imageName }}: true
+    monitor-{{ .Values.deployment.monitorApp.imageName }}: "true"
     {{- end }}
 spec:
   selector:
