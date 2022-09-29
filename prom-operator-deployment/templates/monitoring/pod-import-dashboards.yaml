@@ -1,0 +1,50 @@
+{{- if .Values.prometheus.enabled }}
+apiVersion: v1
+kind: Pod
+metadata:
+  name: {{ .Values.namespace }}-grafana-import-dashboards
+  namespace: {{ .Values.namespace }}
+spec:  
+  initContainers:
+  - name: wait-for-prometheus-before-startup
+    image: busybox
+    command:  ["sh", "-c", 
+    "until nc -z {{ .Values.prometheus.service.name }} {{ .Values.prometheus.service.port }} > /dev/null; 
+    do echo Waiting for prometheus.; sleep 2; done;"]    
+  containers:
+  - name: grafana-import-tool
+    image: {{ .Values.prometheus.grafanaImportTool.imageName }}
+    imagePullPolicy: {{ .Values.prometheus.grafanaImportTool.imagePullPolicy }}
+    ports:
+      - containerPort: 80
+    env:
+    - name: GRAFANA_URL
+      value: "{{ .Values.prometheus.grafanaImportTool.grafanaUrl }}"        
+    - name: GRAFANA_API_KEY
+      value: "{{ .Values.prometheus.grafanaImportTool.grafanaAPIKey }}"                  
+    - name: DATASOURCE_NAME
+      value: "prometheus-ns-{{ .Values.namespace }}"                  
+    - name: DATASOURCE_URL
+      value: "http://{{ .Values.prometheus.service.name }}.{{ .Values.namespace }}:{{ .Values.prometheus.service.port }}"                  
+    - name: NAMESPACE
+      value: "{{ .Values.namespace }}"            
+    startupProbe:
+      httpGet:
+        path: /graf-import-tool/import
+        port: 80
+      initialDelaySeconds: 5
+      periodSeconds: 10      
+  restartPolicy: Never   
+  {{- with .Values.nodeSelector }}
+  nodeSelector:
+    {{- toYaml . | nindent 8 }}
+  {{- end }}
+  {{- with .Values.affinity }}
+  affinity:
+    {{- toYaml . | nindent 8 }}
+  {{- end }}      
+  {{- with .Values.tolerations }}
+  tolerations:
+    {{- toYaml . | nindent 8 }}
+  {{- end }}            
+{{- end }}  
